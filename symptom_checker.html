@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Symptom Checker</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Symptom Checker</h1>
+        <form id="symptomForm">
+            <div class="form-group">
+                <label for="symptoms">Enter Symptoms (comma-separated):</label>
+                <input type="text" id="symptoms" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Check Symptoms</button>
+        </form>
+        <div id="results" class="mt-4"></div>
+    </div>
+
+    <script>
+        // Event listener for form submission
+        document.getElementById('symptomForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            // Get the symptoms from the input field
+            const symptoms = document.getElementById('symptoms').value.split(',').map(s => s.trim());
+
+            // Send data to the backend API
+            fetch('http://localhost:3000/api/symptom-checker', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ symptoms }), // Send symptoms array in the request body
+            })
+            .then(response => response.json())
+            .then(data => {
+                let resultsHtml = '';
+
+                if (data.error) {
+                    // Display error message
+                    resultsHtml = `<p class="text-danger">${data.error}</p>`;
+                } else {
+                    // Display results
+                    resultsHtml = `
+                        <h3>Prediction:</h3>
+                        <ul>
+                            <li><strong>Disease:</strong> ${data.disease}</li>
+                            <li><strong>Specialist:</strong> ${data.specialist}</li>
+                            <li><strong>Medication:</strong> ${data.medication}</li>
+                        </ul>`;
+                }
+
+                document.getElementById('results').innerHTML = resultsHtml;
+            })
+            .catch(error => {
+                document.getElementById('results').innerHTML = `<p class="text-danger">Error: ${error.message}</p>`;
+            });
+        });
+    </script>
+</body>
+</html>

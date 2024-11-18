@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ambulance Management</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Arial', sans-serif;
+        }
+        .container {
+            margin-top: 50px;
+            background-color: #fff;
+            padding: 30px;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            max-width: 800px;
+            margin: auto;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #007bff;
+        }
+        table {
+            width: 100%;
+            text-align: left;
+        }
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        td {
+            background-color: #f8f9fa;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #dc3545;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Ambulance Management</h1>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Gender</th>
+                    <th>Car Name</th>
+                    <th>Available</th>
+                    <th>Location</th>
+                </tr>
+            </thead>
+            <tbody id="ambulanceTableBody">
+                <!-- Ambulance data will be dynamically inserted here -->
+            </tbody>
+        </table>
+        <button id="backButton" onclick="goBack()">BACK</button>
+    </div>
+
+    <script>
+        // Function to fetch ambulance data from the server
+        
+            async function fetchAmbulances() {
+        try {
+            const response = await fetch('http://localhost:3000/ambulances');
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+    
+            const data = await response.json();
+            console.log('Data received:', data);  // Log the data to check the response
+    
+            const tableBody = document.getElementById('ambulanceTableBody');
+            tableBody.innerHTML = '';  // Clear previous data
+    
+            data.forEach(ambulance => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${ambulance.name}</td>
+                    <td>${ambulance.gender}</td>
+                    <td>${ambulance.car_name}</td>
+                    <td>${ambulance.availability ? 'Available' : 'Not Available'}</td>
+                    <td>${ambulance.location}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        } catch (error) {
+            console.error('Error fetching ambulance data:', error);
+        }
+    }
+    
+        // Call the function to fetch and display data when the page loads
+        window.onload = fetchAmbulances;
+
+        // Function to go back to the previous page
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

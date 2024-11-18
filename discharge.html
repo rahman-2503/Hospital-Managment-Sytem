@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Discharge</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #007bff;
+        }
+
+        .info {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        label {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Patient Discharge</h1>
+        <div class="info">
+            <label for="customerId">Customer Id:</label>
+            <select id="customerId" class="form-select">
+                <option value="">Select Patient</option>
+                <!-- Options will be populated dynamically -->
+            </select>
+        </div>
+        <div class="info">
+            <label>Room Number:</label>
+            <span id="roomNumber">Room 101</span>
+        </div>
+        <div class="info">
+            <label>In Time:</label>
+            <span id="inTime">2024-10-20 10:00 AM</span>
+        </div>
+        <div class="info">
+            <label>Out Time:</label>
+            <span id="outTime">2024-10-21 09:00 AM</span>
+        </div>
+        <button id="checkButton">Check</button>
+        <button id="dischargeButton">Discharge</button>
+        <button id="backButton" onclick="goBack()">Back</button>
+    </div>
+
+    <script>
+        // Fetch patients to populate the dropdown
+        function fetchPatients() {
+            fetch('/api/patients')
+                .then(response => response.json())
+                .then(data => {
+                    const customerIdSelect = document.getElementById('customerId');
+                    data.forEach(patient => {
+                        const option = document.createElement('option');
+                        option.value = patient.id; // Assuming 'id' is the patient ID
+                        option.textContent = patient.name; // Display patient's name
+                        customerIdSelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error fetching patients:', error));
+        }
+
+        // Fetch patient data when a patient is selected
+        document.getElementById('checkButton').addEventListener('click', () => {
+            const customerId = document.getElementById('customerId').value;
+            if (!customerId) {
+                alert('Please select a patient');
+                return;
+            }
+
+            fetch(`/api/patients/${customerId}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('roomNumber').textContent = data.room; // Assuming 'room' is the room number
+                    document.getElementById('inTime').textContent = data.time; // Adjust based on your data structure
+                    document.getElementById('outTime').textContent = new Date().toLocaleString(); // Set current time for out time
+                })
+                .catch(error => console.error('Error fetching patient details:', error));
+        });
+
+        // Discharge the selected patient
+        document.getElementById('dischargeButton').addEventListener('click', () => {
+            const customerId = document.getElementById('customerId').value;
+            if (!customerId) {
+                alert('Please select a patient');
+                return;
+            }
+
+            fetch(`/api/patients/${customerId}`, { method: 'DELETE' })
+                .then(response => {
+                    if (response.ok) {
+                        alert('Patient discharged successfully');
+                        // Optionally, reset the dropdown and clear info
+                        document.getElementById('customerId').value = '';
+                        document.getElementById('roomNumber').textContent = '';
+                        document.getElementById('inTime').textContent = '';
+                        document.getElementById('outTime').textContent = '';
+                    } else {
+                        alert('Error discharging patient');
+                    }
+                })
+                .catch(error => console.error('Error discharging patient:', error));
+        });
+
+        // Fetch patients when the page loads
+        window.onload = fetchPatients;
+
+        // Function to go back
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+</body>
+</html>

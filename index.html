@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Management System - Login</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="styylesheet" href="style.css">
+        <style>
+            h1 {
+                text-align: left; /* Align text to the left */
+                font-size: 36px;
+                font-weight: 600;
+                padding: 15px;
+                color: #fff;
+                background: linear-gradient(45deg, #1845ad, #23a2f6); /* Gradient background */
+                border: 4px solid #fff; /* White border */
+                border-radius: 10px; /* Rounded corners */
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Shadow for depth */
+                width: fit-content;
+                margin-left: 20px; /* Move it slightly to the left */
+                margin-top: 20px; /* Add some space from the top */
+                position: relative;
+            }
+            
+            
+        * {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background-image: url('https://your-background-image-url.jpg'); /* Replace with your image URL */
+            background-size: cover;
+            background-position: center;
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .background {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        .shape {
+            height: 200px;
+            width: 200px;
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+        }
+        .shape:first-child {
+            background: linear-gradient(#1845ad, #23a2f6);
+            left: -80px;
+            top: -80px;
+        }
+        .shape:last-child {
+            background: linear-gradient(to right, #ff512f, #f09819);
+            right: -30px;
+            bottom: -80px;
+        }
+        .login-box {
+            height: 520px;
+            width: 400px;
+            background-color: rgba(255, 255, 255, 0.13);
+            border-radius: 10px;
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 40px rgba(8, 7, 16, 0.6);
+            padding: 50px 35px;
+            position: relative;
+            animation: fadeIn 1s ease-in-out; /* Animation effect */
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .login-box * {
+            color: #ffffff;
+            letter-spacing: 0.5px;
+            outline: none;
+            border: none;
+        }
+        .login-box h2 {
+            font-size: 32px;
+            font-weight: 500;
+            line-height: 42px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        label {
+            display: block;
+            margin-top: 20px;
+            font-size: 16px;
+            font-weight: 500;
+        }
+        input {
+            display: block;
+            height: 50px;
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.07);
+            border-radius: 5px;
+            padding: 0 10px;
+            margin-top: 8px;
+            font-size: 14px;
+            font-weight: 300;
+            color: #e5e5e5;
+            transition: background-color 0.3s; /* Transition for hover effect */
+        }
+        input:focus {
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+        button {
+            margin-top: 50px;
+            width: 100%;
+            background-color:black;
+            color: #080710;
+            padding: 15px 0;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s; /* Transition for hover effect */
+        }
+        button:hover {
+            background-color: #f0f0f0;
+            transform: translateY(-2px);
+        }
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        .buttons button {
+            width: 48%;
+        }
+    </style>
+</head>
+<body>
+    <h1>Hospital Management System</h1>
+    <div class="background">
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+    <div class="login-box">
+        <h2>Login Page</h2>
+        <form id="login-form" onsubmit="return handleLogin(event)">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" placeholder="Enter your username" required>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" placeholder="Enter your password" required>
+            <div class="buttons">
+                <button type="submit" class="btn">Login</button>
+                <button type="reset" class="btn">Cancel</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        function handleLogin(event) {
+            event.preventDefault();
+            // Add your authentication logic here (e.g., sending data to server)
+            window.location.href = 'reception.html'; // Redirect after login
+        }
+    </script>
+</body>
+</html>
