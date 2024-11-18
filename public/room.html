@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room Availability</title>
+    <style>
+        /* Add some basic styling */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Room Availability</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Room Number</th>
+                <th>Availability</th>
+                <th>Price</th>
+                <th>Bed Type</th>
+            </tr>
+        </thead>
+        <tbody id="roomData">
+            <!-- Room data will be populated here by JavaScript -->
+        </tbody>
+    </table>
+
+    <script>
+        // Fetch room data from the server
+        window.onload = function() {
+            fetch('http://localhost:3000/api/rooms')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(rooms => {
+                    const roomData = document.getElementById('roomData');
+                    roomData.innerHTML = ''; // Clear existing room data
+
+                    // Populate table with room data
+                    rooms.forEach(room => {
+                        const row = document.createElement('tr');
+
+                        const roomNo = document.createElement('td');
+                        roomNo.textContent = room.RoomNo;
+                        row.appendChild(roomNo);
+
+                        const availability = document.createElement('td');
+                        availability.textContent = room.Availability === 'Available' ? 'Available' : 'Occupied';
+                        row.appendChild(availability);
+
+                        const price = document.createElement('td');
+                        price.textContent = `$${room.Price}`;
+                        row.appendChild(price);
+
+                        const bedType = document.createElement('td');
+                        bedType.textContent = room.BedType;
+                        row.appendChild(bedType);
+
+                        roomData.appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching rooms:', error);
+                    alert('Failed to load room data. Please try again later.');
+                });
+        };
+    </script>
+</body>
+</html>

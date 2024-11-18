@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IoT Data</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .chart-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            width: 100%;
+            max-width: 500px;
+            height: 300px;
+        }
+
+        .table-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        #charts {
+            width: 50%;
+        }
+
+        #table {
+            width: 50%;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="mt-5">Simulated IoT Data</h1>
+        <div class="row">
+            <div class="chart-container" id="charts">
+                <h3>Patient Monitoring Trends</h3>
+                <canvas id="lifeSupportChart"></canvas>
+            </div>
+            <div class="table-container" id="table">
+                <h3>Patient Monitoring Data</h3>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Attribute</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dataRows">
+                        <tr>
+                            <td>Heart Rate:</td>
+                            <td id="heartRate">-- bpm</td>
+                        </tr>
+                        <tr>
+                            <td>Blood Pressure:</td>
+                            <td id="bloodPressure">-- mmHg</td>
+                        </tr>
+                        <tr>
+                            <td>Temperature:</td>
+                            <td id="temperature">-- °C</td>
+                        </tr>
+                        <tr>
+                            <td>Humidity:</td>
+                            <td id="humidity">-- %</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <button id="refreshButton" class="btn btn-primary mt-3">Refresh Data</button>
+    </div>
+
+    <script>
+        const heartRateHistory = [];
+        const bloodPressureHistory = [];
+        const labels = [];
+        const maxPoints = 20; // Maximum points to display on the chart
+
+        // Create the chart
+        const lifeSupportChart = new Chart(document.getElementById('lifeSupportChart').getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Heart Rate (bpm)',
+                    data: heartRateHistory,
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    fill: true,
+                    tension: 0.1
+                }, {
+                    label: 'Blood Pressure (mmHg)',
+                    data: bloodPressureHistory,
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    fill: true,
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Time'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Value'
+                        }
+                    }
+                }
+            }
+        });
+
+        function fetchIoTData() {
+            fetch('/api/iot-data')
+                .then(response => response.json())
+                .then(data => {
+                    updateMonitoringData(data);
+                    updateCharts(data);
+                })
+                .catch(err => console.error('Error fetching IoT data:', err));
+        }
+
+        function updateMonitoringData(data) {
+            // Update table with new data
+            document.getElementById('heartRate').innerText = `${data.heartRate} bpm`;
+            document.getElementById('bloodPressure').innerText = `${data.bloodPressure} mmHg`;
+            document.getElementById('temperature').innerText = `${data.temperature} °C`;
+            document.getElementById('humidity').innerText = `${data.humidity} %`;
+        }
+
+        function updateCharts(data) {
+            // Add new data points to history
+            heartRateHistory.push(data.heartRate);
+            bloodPressureHistory.push(data.bloodPressure);
+            labels.push(new Date().toLocaleTimeString());
+
+            // Maintain the maximum number of points
+            if (heartRateHistory.length > maxPoints) {
+                heartRateHistory.shift();
+                bloodPressureHistory.shift();
+                labels.shift();
+            }
+
+            // Update chart with new data
+            lifeSupportChart.update();
+        }
+
+        // Simulate live data
+        function simulateLiveData() {
+            const simulatedData = {
+                heartRate: Math.floor(Math.random() * (100 - 60 + 1)) + 60, // Random heart rate between 60 and 100
+                bloodPressure: Math.floor(Math.random() * (120 - 80 + 1)) + 80, // Random blood pressure between 80 and 120
+                temperature: (Math.random() * (37 - 36 + 1) + 36).toFixed(1), // Random temperature between 36 and 37 °C
+                humidity: Math.floor(Math.random() * 100) // Random humidity
+            };
+            updateMonitoringData(simulatedData);
+            updateCharts(simulatedData);
+        }
+
+        // Fetch real data when the page loads
+        fetchIoTData();
+
+        // Simulate live data every second
+        setInterval(simulateLiveData, 1000);
+
+        document.getElementById('refreshButton').addEventListener('click', fetchIoTData);
+    </script>
+</body>
+
+</html>

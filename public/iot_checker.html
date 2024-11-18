@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IoT Data Receiver</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .container {
+            margin-top: 50px;
+            background-color: #fff;
+            padding: 30px;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            max-width: 800px;
+            margin: auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #007bff;
+        }
+
+        .data-display {
+            margin-bottom: 20px;
+        }
+
+        textarea {
+            width: 100%;
+            resize: none;
+            border-radius: 5px;
+            border: 1px solid #ced4da;
+            padding: 10px;
+            background-color: #f8f9fa;
+            font-size: 14px;
+            color: #495057;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .back-button {
+            margin-top: 20px;
+            background-color: #dc3545;
+        }
+
+        .back-button:hover {
+            background-color: #c82333;
+        }
+
+        table {
+            width: 100%;
+            margin-top: 30px;
+            border-collapse: collapse;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>IoT Data Receiver</h1>
+        </header>
+
+        <div class="data-display">
+            <textarea id="dataArea" rows="15" readonly></textarea>
+        </div>
+
+        <button class="btn" onclick="closeReceiver()">Close</button>
+        <button class="back-button" onclick="goBack()">Back to Previous Page</button>
+
+        <!-- Table to display data -->
+        <table id="dataTable">
+            <thead>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>Temperature</th>
+                    <th>Heart Rate</th>
+                    <th>Blood Pressure</th>
+                    <th>Oxygen Level</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Data will be populated dynamically -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Global variables for chart and table
+        let chartData = [];
+        let tableData = [];
+
+        // Function to go back to the previous page
+        function goBack() {
+            window.history.back(); // Navigate back to the previous page
+        }
+
+        // Simulated function to fetch IoT data every 2 seconds
+        function fetchIoTData() {
+            setInterval(() => {
+                const newData = {
+                    timestamp: new Date().toLocaleString(),
+                    temperature: (Math.random() * 10 + 36).toFixed(1),
+                    heartRate: (Math.random() * 30 + 60).toFixed(0),
+                    bloodPressure: `${(Math.random() * 20 + 120).toFixed(0)}/${(Math.random() * 10 + 80).toFixed(0)}`,
+                    oxygenLevel: (Math.random() * 10 + 90).toFixed(1),
+                };
+
+                updateMonitoringData(newData);
+                updateCharts(newData);
+                updateTable(newData);
+            }, 2000); // Fetch new data every 2 seconds
+        }
+
+        // Function to update the textarea with new data
+        function updateMonitoringData(data) {
+            const dataArea = document.getElementById("dataArea");
+            dataArea.value = `Timestamp: ${data.timestamp}\nTemperature: ${data.temperature}°C\nHeart Rate: ${data.heartRate} BPM\nBlood Pressure: ${data.bloodPressure}\nOxygen Level: ${data.oxygenLevel}%`;
+        }
+
+        // Function to update the chart (simulate chart update)
+        function updateCharts(data) {
+            // Here, add your chart update code (e.g., using Chart.js or other libraries)
+            console.log('Chart updated with data:', data);
+        }
+
+        // Function to update the table with new data
+        function updateTable(data) {
+            // Add new data row to the table
+            tableData.push(data);
+
+            // If the table exceeds 5 rows, remove the first row
+            if (tableData.length > 5) {
+                tableData.shift();
+            }
+
+            // Update table display
+            const tableBody = document.querySelector("#dataTable tbody");
+            tableBody.innerHTML = ""; // Clear existing rows
+            tableData.forEach(item => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${item.timestamp}</td>
+                    <td>${item.temperature}°C</td>
+                    <td>${item.heartRate} BPM</td>
+                    <td>${item.bloodPressure}</td>
+                    <td>${item.oxygenLevel}%</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Initialize the data fetching process
+        fetchIoTData();
+        
+        // Close the receiver (you can define closeReceiver function as needed)
+        function closeReceiver() {
+            alert("Receiver closed");
+        }
+    </script>
+</body>
+
+</html>
