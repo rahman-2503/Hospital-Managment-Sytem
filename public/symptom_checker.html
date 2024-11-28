@@ -1,64 +1,117 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Symptom Checker</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Symptom Checker</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .dropdown-menu {
+            position: absolute;
+            width: 100%;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+    </style>
 </head>
 <body>
-    <div class="container mt-5">
-        <h1>Symptom Checker</h1>
-        <form id="symptomForm">
-            <div class="form-group">
-                <label for="symptoms">Enter Symptoms (comma-separated):</label>
-                <input type="text" id="symptoms" class="form-control" required>
-            </div>
-            <button type="submit" class="btn btn-primary">Check Symptoms</button>
-        </form>
-        <div id="results" class="mt-4"></div>
-    </div>
+    <div class="container mt-5">
+        <h1>Symptom Checker</h1>
+        <form id="symptomForm" class="position-relative">
+            <div class="form-group">
+                <label for="symptoms">Enter Symptoms:</label>
+                <input type="text" id="symptoms" class="form-control" autocomplete="off" required>
+                <div id="suggestions" class="dropdown-menu"></div>
+            </div>
+            <button type="submit" class="btn btn-primary">Check Symptoms</button>
+        </form>
+        <div id="results" class="mt-4"></div>
+    </div>
 
-    <script>
-        // Event listener for form submission
-        document.getElementById('symptomForm').addEventListener('submit', function (e) {
-            e.preventDefault();
+    <script>
+        // Array of symptom suggestions
+        const symptomList = [
+            'Fever', 'Cough', 'Headache', 'Back pain', 'Abdominal pain',
+            'Nausea', 'Fatigue', 'Dizziness', 'Skin rash', 'Joint pain',
+            'Weight loss', 'Frequent urination', 'Swelling', 'Sore throat',
+            'Runny nose', 'Constipation', 'Diarrhea', 'Chest pain', 'Sweating',
+            'Itching', 'Hair loss', 'Yellowing of skin', 'Loss of appetite',
+            'Painful urination', 'Cold hands and feet'
+        ];
 
-            // Get the symptoms from the input field
-            const symptoms = document.getElementById('symptoms').value.split(',').map(s => s.trim());
+        const symptomInput = document.getElementById('symptoms');
+        const suggestionsContainer = document.getElementById('suggestions');
 
-            // Send data to the backend API
-            fetch('http://localhost:3000/api/symptom-checker', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ symptoms }), // Send symptoms array in the request body
-            })
-            .then(response => response.json())
-            .then(data => {
-                let resultsHtml = '';
+        // Function to filter and display suggestions
+        symptomInput.addEventListener('input', function () {
+            const query = symptomInput.value.toLowerCase();
+            const matchedSymptoms = symptomList.filter(symptom =>
+                symptom.toLowerCase().includes(query)
+            );
 
-                if (data.error) {
-                    // Display error message
-                    resultsHtml = `<p class="text-danger">${data.error}</p>`;
-                } else {
-                    // Display results
-                    resultsHtml = `
-                        <h3>Prediction:</h3>
-                        <ul>
-                            <li><strong>Disease:</strong> ${data.disease}</li>
-                            <li><strong>Specialist:</strong> ${data.specialist}</li>
-                            <li><strong>Medication:</strong> ${data.medication}</li>
-                        </ul>`;
-                }
+            // Clear previous suggestions
+            suggestionsContainer.innerHTML = '';
 
-                document.getElementById('results').innerHTML = resultsHtml;
-            })
-            .catch(error => {
-                document.getElementById('results').innerHTML = `<p class="text-danger">Error: ${error.message}</p>`;
-            });
-        });
-    </script>
+            if (matchedSymptoms.length > 0 && query) {
+                // Show suggestions dropdown
+                suggestionsContainer.classList.add('show');
+
+                matchedSymptoms.forEach(symptom => {
+                    const suggestionItem = document.createElement('div');
+                    suggestionItem.className = 'dropdown-item';
+                    suggestionItem.textContent = symptom;
+                    suggestionItem.addEventListener('click', () => {
+                        // Add selected symptom to input field
+                        symptomInput.value = symptom;
+                        suggestionsContainer.classList.remove('show');
+                    });
+                    suggestionsContainer.appendChild(suggestionItem);
+                });
+            } else {
+                suggestionsContainer.classList.remove('show');
+            }
+        });
+
+        // Event listener for form submission
+        document.getElementById('symptomForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            // Get the symptoms from the input field
+            const symptoms = symptomInput.value.split(',').map(s => s.trim());
+
+            // Send data to the backend API
+            fetch('http://localhost:3000/api/symptom-checker', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ symptoms }), // Send symptoms array in the request body
+            })
+            .then(response => response.json())
+            .then(data => {
+                let resultsHtml = '';
+
+                if (data.error) {
+                    // Display error message
+                    resultsHtml = `<p class="text-danger">${data.error}</p>`;
+                } else {
+                    // Display results
+                    resultsHtml = `
+                        <h3>Prediction:</h3>
+                        <ul>
+                            <li><strong>Disease:</strong> ${data.disease}</li>
+                            <li><strong>Specialist:</strong> ${data.specialist}</li>
+                            <li><strong>Medication:</strong> ${data.medication}</li>
+                        </ul>`;
+                }
+
+                document.getElementById('results').innerHTML = resultsHtml;
+            })
+            .catch(error => {
+                document.getElementById('results').innerHTML = `<p class="text-danger">Error: ${error.message}</p>`;
+            });
+        });
+    </script>
 </body>
 </html>
